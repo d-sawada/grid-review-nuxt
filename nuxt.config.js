@@ -31,6 +31,7 @@ export default {
    ** Global CSS
    */
   css: [
+    '@/node_modules/handsontable/dist/handsontable.full.css'
   ],
   /*
    ** Plugins to load before mounting the App
