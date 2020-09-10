@@ -10,16 +10,6 @@
 </template>
 
 <script>
-import '@/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-alpine-dark.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-balham-dark.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-blue.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-bootstrap.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-dark.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-fresh.css'
-import '@/node_modules/ag-grid-community/dist/styles/ag-theme-material.css'
 import { AgGridVue } from 'ag-grid-vue'
 
 export default {

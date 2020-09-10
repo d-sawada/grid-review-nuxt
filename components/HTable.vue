@@ -1,7 +1,7 @@
 <template>
   <hot-table
     :data="data"
-    v-bind="tableSettings"
+    :settings="tableSettings"
   />
 </template>
 
@@ -27,7 +27,9 @@ export default {
   computed: {
     tableSettings () {
       return Object.assign({}, {
-        licenseKey: 'non-commercial-and-evaluation'
+        licenseKey: 'non-commercial-and-evaluation',
+        colHeader: true,
+        manualColumnMove: true
       }, this.settings)
     }
   }
