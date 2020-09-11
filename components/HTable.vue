@@ -31,32 +31,6 @@ export default {
   },
 
   computed: {
-    colHeaders () {
-      return this.columns.map(column => column.header)
-    },
-    columnSettings () {
-      return this.columns.map(column =>
-        Object.assign({}, this.formatters[column.type], {
-          data: column.field
-        })
-      )
-    },
-    tableSettings () {
-      return Object.assign({}, {
-        licenseKey: 'non-commercial-and-evaluation',
-        language: 'ja-JP',
-        manualColumnMove: true,
-        manualColumnResize: true,
-        columnSorting: true,
-        sortEmptyCells: true,
-        filters: true,
-        afterGetColHeader: this._addInputAfterGetColHeader,
-        beforeOnCellMouseDown: this._preventSelectColumnBeforeOnCellMouseDown,
-        data: this.data,
-        colHeaders: this.colHeaders,
-        columns: this.columnSettings
-      }, this.settings)
-    },
     formatters: () => ({
       numeric: {
         type: 'numeric'
@@ -93,7 +67,37 @@ export default {
           }
         }
       }
-    })
+    }),
+
+    colHeaders () {
+      return this.columns.map(column => column.header)
+    },
+
+    columnSettings () {
+      return this.columns.map(column =>
+        Object.assign({}, this.formatters[column.type], {
+          data: column.field
+        })
+      )
+    },
+
+    tableSettings () {
+      return Object.assign({}, {
+        licenseKey: 'non-commercial-and-evaluation',
+        language: 'ja-JP',
+        manualColumnMove: true,
+        manualColumnResize: true,
+        stretchH: 'all',
+        columnSorting: true,
+        sortEmptyCells: true,
+        filters: true,
+        afterGetColHeader: this._addInputAfterGetColHeader,
+        beforeOnCellMouseDown: this._preventSelectColumnBeforeOnCellMouseDown,
+        data: this.data,
+        colHeaders: this.colHeaders,
+        columns: this.columnSettings
+      }, this.settings)
+    }
   },
 
   methods: {
