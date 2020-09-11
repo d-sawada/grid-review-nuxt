@@ -16,6 +16,17 @@ function TenthousandRenderer (hotInstance, TD, row, column, prop, value, cellPro
   return TD
 }
 
+class TenthousandEditor extends Handsontable.editors.TextEditor {
+  beginEditing (newInitialValue, event) {
+    super.beginEditing(newInitialValue, event)
+    this.TEXTAREA.value = this.originalValue / 1000
+  }
+
+  getValue () {
+    return this.TEXTAREA.value * 1000
+  }
+}
+
 export default {
   components: {
     HotTable
@@ -54,7 +65,8 @@ export default {
           pattern: '¥0,0',
           culture: 'ja-JP'
         },
-        renderer: 'mg.tenthousand'
+        renderer: 'mg.tenthousand',
+        editor: TenthousandEditor
       },
       date: {
         type: 'date',
