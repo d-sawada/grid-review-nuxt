@@ -187,20 +187,21 @@ export default {
       if (typeof col !== 'number') {
         return col
       }
+      if (col < 0 || TH.childElementCount >= 2) {
+        return
+      }
 
-      if (col >= 0 && TH.childElementCount < 2) {
-        const column = this.columns[col]
-        const filterConfig = Object.assign(
-          {},
-          this.defaultFilterConfig,
-          this.formatters[column.type].filterConfig
-        )
+      const column = this.columns[col]
+      const filterConfig = Object.assign(
+        {},
+        this.defaultFilterConfig,
+        this.formatters[column.type].filterConfig
+      )
 
-        if (filterConfig.type === 'input') {
-          this._createFilterInput(col, TH, filterConfig)
-        } else if (filterConfig.type === 'select') {
-          this._createFilterSelect(col, TH, filterConfig)
-        }
+      if (filterConfig.type === 'input') {
+        this._createFilterInput(col, TH, filterConfig)
+      } else if (filterConfig.type === 'select') {
+        this._createFilterSelect(col, TH, filterConfig)
       }
     },
 
