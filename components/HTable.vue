@@ -1,11 +1,12 @@
 <template>
-  <hot-table :settings="tableSettings" />
+  <hot-table ref="hotTable" :settings="tableSettings" />
 </template>
 
 <script>
 import 'handsontable/languages/ja-JP.js'
 import moment from 'moment'
 import { HotTable } from '@handsontable/vue'
+import Handsontable from 'handsontable'
 
 moment.locale('ja')
 
@@ -47,6 +48,9 @@ export default {
         manualColumnMove: true,
         columnSorting: true,
         sortEmptyCells: true,
+        filters: true,
+        afterGetColHeader: this._addInputAfterGetColHeader,
+        beforeOnCellMouseDown: this._preventSelectColumnBeforeOnCellMouseDown,
         data: this.data,
         colHeaders: this.colHeaders,
         columns: this.columnSettings
@@ -89,6 +93,42 @@ export default {
         }
       }
     })
+  },
+
+  methods: {
+    hot () {
+      return this.$refs.hotTable.hotInstance
+    },
+
+    _addInputAfterGetColHeader (col, TH) {
+      if (typeof col !== 'number') {
+        return col
+      }
+
+      if (col >= 0 && TH.childElementCount < 2) {
+        const div = document.createElement('div')
+        const input = document.createElement('input')
+        div.className = 'filterHeader'
+
+        const debounceFn = Handsontable.helper.debounce((event) => {
+          const filtersPlugin = this.hot().getPlugin('filters')
+          filtersPlugin.removeConditions(col)
+          filtersPlugin.addCondition(col, 'contains', [event.target.value])
+          filtersPlugin.filter()
+        }, 200)
+        input.addEventListener('keydown', debounceFn)
+
+        div.appendChild(input)
+        TH.appendChild(div)
+      }
+    },
+
+    _preventSelectColumnBeforeOnCellMouseDown (event, coords) {
+      if (coords.row === -1 && event.target.nodeName === 'INPUT') {
+        event.stopImmediatePropagation()
+        this.hot().deselectCell()
+      }
+    }
   }
 }
 </script>
