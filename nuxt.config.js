@@ -31,17 +31,6 @@ export default {
    ** Global CSS
    */
   css: [
-    '@/node_modules/ag-grid-community/dist/styles/ag-grid.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-alpine-dark.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-balham-dark.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-blue.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-bootstrap.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-dark.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-fresh.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-material.css',
-    '@/node_modules/handsontable/dist/handsontable.full.css'
   ],
   /*
    ** Plugins to load before mounting the App

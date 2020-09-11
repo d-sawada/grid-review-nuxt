@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import 'handsontable/dist/handsontable.full.css'
 import 'handsontable/languages/ja-JP.js'
 import moment from 'moment'
 import { HotTable } from '@handsontable/vue'
@@ -49,6 +50,9 @@ export default {
 
   computed: {
     formatters: () => ({
+      text: {
+        type: 'text'
+      },
       numeric: {
         type: 'numeric'
       },
@@ -66,7 +70,10 @@ export default {
           culture: 'ja-JP'
         },
         renderer: 'mg.tenthousand',
-        editor: TenthousandEditor
+        editor: TenthousandEditor,
+        filterConfig: {
+          setCondition: (register, value) => register('contains', [value * 1000])
+        }
       },
       date: {
         type: 'date',
@@ -86,6 +93,11 @@ export default {
           }
         }
       }
+    }),
+
+    defaultFilterConfig: () => ({
+      type: 'input',
+      setCondition: (register, value) => register('contains', [value])
     }),
 
     colHeaders () {
@@ -128,27 +140,67 @@ export default {
       return this.$refs.hotTable.hotInstance
     },
 
+    _createFilterInput (col, TH, filterConfig) {
+      const DIV = document.createElement('div')
+      const INPUT = document.createElement('input')
+      DIV.className = 'filterHeader'
+      INPUT.style.width = '100%'
+
+      INPUT.addEventListener('keydown', Handsontable.helper.debounce((event) => {
+        const filtersPlugin = this.hot().getPlugin('filters')
+        const regist = (op, args) => filtersPlugin.addCondition(col, op, args)
+        filtersPlugin.removeConditions(col)
+        filterConfig.setCondition(regist, event.target.value)
+        filtersPlugin.filter()
+      }, 200))
+
+      DIV.appendChild(INPUT)
+      TH.appendChild(DIV)
+    },
+
+    _createFilterSelect (col, TH, filterConfig) {
+      const DIV = document.createElement('div')
+      const SELECT = document.createElement('select')
+      SELECT.style.width = '100%'
+
+      const options = filterConfig.options || []
+      options.forEach((option) => {
+        const OPTION = document.createElement('option')
+        OPTION.value = option.value
+        OPTION.innerHTML = option.text
+        SELECT.appendChild(OPTION)
+      })
+
+      SELECT.addEventListener('change', Handsontable.helper.debounce((event) => {
+        const filtersPlugin = this.hot().getPlugin('filters')
+        const regist = (op, args) => filtersPlugin.addCondition(col, op, args)
+        filtersPlugin.removeConditions(col)
+        filterConfig.setCondition(regist, event.target.value)
+        filtersPlugin.filter()
+      }, 200))
+
+      DIV.appendChild(SELECT)
+      TH.appendChild(DIV)
+    },
+
     _addInputAfterGetColHeader (col, TH) {
       if (typeof col !== 'number') {
         return col
       }
 
       if (col >= 0 && TH.childElementCount < 2) {
-        const div = document.createElement('div')
-        const input = document.createElement('input')
-        div.className = 'filterHeader'
-        input.style.width = '100%'
+        const column = this.columns[col]
+        const filterConfig = Object.assign(
+          {},
+          this.defaultFilterConfig,
+          this.formatters[column.type].filterConfig
+        )
 
-        const debounceFn = Handsontable.helper.debounce((event) => {
-          const filtersPlugin = this.hot().getPlugin('filters')
-          filtersPlugin.removeConditions(col)
-          filtersPlugin.addCondition(col, 'contains', [event.target.value])
-          filtersPlugin.filter()
-        }, 200)
-        input.addEventListener('keydown', debounceFn)
-
-        div.appendChild(input)
-        TH.appendChild(div)
+        if (filterConfig.type === 'input') {
+          this._createFilterInput(col, TH, filterConfig)
+        } else if (filterConfig.type === 'select') {
+          this._createFilterSelect(col, TH, filterConfig)
+        }
       }
     },
 
