@@ -15,7 +15,7 @@ export default {
   data: () => ({
     data: [...Array(200)].map(() => ({
       settlementDate: '2020/08/10',
-      loanMoney: 50000,
+      loanMoney: 50000000,
       otherFee: 37800,
       customerName: '澤田 大輔',
       customerAge: 24

@@ -10,6 +10,12 @@ import Handsontable from 'handsontable'
 
 moment.locale('ja')
 
+function TenthousandRenderer (hotInstance, TD, row, column, prop, value, cellProperties) {
+  TD.innerHTML = (Number(value) / 1000).toLocaleString()
+  TD.style.textAlign = 'right'
+  return TD
+}
+
 export default {
   components: {
     HotTable
@@ -47,7 +53,8 @@ export default {
         numericFormat: {
           pattern: '¥0,0',
           culture: 'ja-JP'
-        }
+        },
+        renderer: 'mg.tenthousand'
       },
       date: {
         type: 'date',
@@ -98,6 +105,10 @@ export default {
         columns: this.columnSettings
       }, this.settings)
     }
+  },
+
+  created () {
+    Handsontable.renderers.registerRenderer('mg.tenthousand', TenthousandRenderer)
   },
 
   methods: {
