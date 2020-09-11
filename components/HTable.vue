@@ -46,6 +46,7 @@ export default {
         licenseKey: 'non-commercial-and-evaluation',
         language: 'ja-JP',
         manualColumnMove: true,
+        manualColumnResize: true,
         columnSorting: true,
         sortEmptyCells: true,
         filters: true,
@@ -109,6 +110,7 @@ export default {
         const div = document.createElement('div')
         const input = document.createElement('input')
         div.className = 'filterHeader'
+        input.style.width = '100%'
 
         const debounceFn = Handsontable.helper.debounce((event) => {
           const filtersPlugin = this.hot().getPlugin('filters')
