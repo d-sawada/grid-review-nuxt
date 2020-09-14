@@ -17,14 +17,14 @@ export default {
       settlementDate: '2020/08/10',
       loanMoney: 50000000,
       otherFee: 37800,
-      customerName: '澤田 大輔',
+      customerName: 1,
       customerAge: 24
     })),
     columns: [
       { header: '取引日', field: 'settlementDate', type: 'date' },
       { header: '融資金額(千円)', field: 'loanMoney', type: 'tenthousand' },
       { header: 'その他費用', field: 'otherFee', type: 'currensy' },
-      { header: '顧客氏名', field: 'customerName', type: 'text' },
+      { header: '顧客氏名', field: 'customerName', type: 'customSelect', selectOptions: { 1: '澤田 大輔', 2: '澤田 ほげ' } },
       { header: '年齢', field: 'customerAge', type: 'numeric' }
     ],
     settings: {

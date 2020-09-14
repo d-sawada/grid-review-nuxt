@@ -9,11 +9,18 @@ import moment from 'moment'
 import { HotTable } from '@handsontable/vue'
 import Handsontable from 'handsontable'
 
+global.hoge = undefined
+
 moment.locale('ja')
 
 function TenthousandRenderer (hotInstance, TD, row, column, prop, value, cellProperties) {
   TD.innerHTML = (Number(value) / 1000).toLocaleString()
   TD.style.textAlign = 'right'
+  return TD
+}
+
+function CustomSelectRenderer (hotInstance, TD, row, column, prop, value, cellProperties) {
+  TD.innerHTML = cellProperties.selectOptions[value]
   return TD
 }
 
@@ -72,7 +79,7 @@ export default {
         renderer: 'mg.tenthousand',
         editor: TenthousandEditor,
         filterConfig: {
-          setCondition: (register, value) => register('contains', [value * 1000])
+          setCondition: (regist, value) => regist('contains', [value * 1000])
         }
       },
       date: {
@@ -92,6 +99,28 @@ export default {
             weekdaysShort: moment.localeData()._weekdaysShort
           }
         }
+      },
+      select: {
+        editor: 'select',
+        filterConfig: {
+          type: 'select',
+          setCondition: (regist, value) => regist('contains', [value])
+        }
+      },
+      customSelect: {
+        editor: 'select',
+        renderer: 'mg.customSelect',
+        filterConfig: {
+          type: 'select',
+          setCondition: (regist, value) => regist('contains', [value])
+        }
+      },
+      customSelectWithInputFilter: {
+        editor: 'select',
+        filterConfig: {
+          type: 'input',
+          setCondition: (regist, value) => regist('contains', [value])
+        }
       }
     }),
 
@@ -105,11 +134,16 @@ export default {
     },
 
     columnSettings () {
-      return this.columns.map(column =>
-        Object.assign({}, this.formatters[column.type], {
-          data: column.field
-        })
-      )
+      return this.columns.map((column) => {
+        return Object.assign(
+          {},
+          this.formatters[column.type],
+          {
+            data: column.field,
+            selectOptions: column.selectOptions
+          }
+        )
+      })
     },
 
     tableSettings () {
@@ -133,6 +167,7 @@ export default {
 
   created () {
     Handsontable.renderers.registerRenderer('mg.tenthousand', TenthousandRenderer)
+    Handsontable.renderers.registerRenderer('mg.customSelect', CustomSelectRenderer)
   },
 
   methods: {
@@ -158,16 +193,16 @@ export default {
       TH.appendChild(DIV)
     },
 
-    _createFilterSelect (col, TH, filterConfig) {
+    _createFilterSelect (col, TH, filterConfig, options) {
       const DIV = document.createElement('div')
       const SELECT = document.createElement('select')
       SELECT.style.width = '100%'
 
-      const options = filterConfig.options || []
-      options.forEach((option) => {
+      SELECT.appendChild(document.createElement('option'))
+      Object.keys(options).forEach((key) => {
         const OPTION = document.createElement('option')
-        OPTION.value = option.value
-        OPTION.innerHTML = option.text
+        OPTION.value = key
+        OPTION.innerHTML = options[key]
         SELECT.appendChild(OPTION)
       })
 
@@ -201,7 +236,16 @@ export default {
       if (filterConfig.type === 'input') {
         this._createFilterInput(col, TH, filterConfig)
       } else if (filterConfig.type === 'select') {
-        this._createFilterSelect(col, TH, filterConfig)
+        let options = column.selectOptions
+        if (Array.isArray(options)) {
+          options = {}
+          column.selectOptions.forEach((option, index) => {
+            options[index] = option
+          })
+        }
+        this._createFilterSelect(col, TH, filterConfig, options)
+      } else if (filterConfig.type === 'customSelect') {
+        this._createFilterSelect(col, TH, filterConfig, column.selectOptions)
       }
     },
 
