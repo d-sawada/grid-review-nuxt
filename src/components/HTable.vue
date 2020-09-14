@@ -250,7 +250,10 @@ export default {
     },
 
     _preventSelectColumnBeforeOnCellMouseDown (event, coords) {
-      if (coords.row === -1 && event.target.nodeName === 'INPUT') {
+      if (
+        coords.row === -1 &&
+        (event.target.nodeName === 'INPUT' || event.target.nodeName === 'SELECT')
+      ) {
         event.stopImmediatePropagation()
         this.hot().deselectCell()
       }
