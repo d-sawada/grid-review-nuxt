@@ -17,6 +17,11 @@ moment.locale('ja')
 Handsontable.renderers.registerRenderer('mg.tenthousand', TenthousandRenderer)
 Handsontable.renderers.registerRenderer('mg.customSelect', CustomSelectRenderer)
 
+const defaultFilterConfig = {
+  type: 'input',
+  setCondition: (regist, value) => regist('contains', [value])
+}
+
 export default {
   components: {
     HotTable
@@ -38,11 +43,6 @@ export default {
   },
 
   computed: {
-    defaultFilterConfig: () => ({
-      type: 'input',
-      setCondition: (regist, value) => regist('contains', [value])
-    }),
-
     colHeaders () {
       return this.columns.map(column => column.header)
     },
@@ -141,7 +141,7 @@ export default {
       const column = this.columns[col]
       const filterConfig = Object.assign(
         {},
-        this.defaultFilterConfig,
+        defaultFilterConfig,
         formatters[column.type].filterConfig
       )
 
