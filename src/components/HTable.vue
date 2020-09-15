@@ -33,6 +33,16 @@ class TenthousandEditor extends Handsontable.editors.TextEditor {
   }
 }
 
+class RecordEditor extends Handsontable.editors.SelectEditor {
+  getValue () {
+    return parseInt(this.select.value)
+  }
+
+  setValue (value) {
+    this.select.value = parseInt(value)
+  }
+}
+
 export default {
   components: {
     HotTable
@@ -120,6 +130,21 @@ export default {
             Object.keys(options).forEach((key) => {
               if (options[key].includes(value)) {
                 matchKeys.push(key)
+              }
+            })
+            regist('by_value', [matchKeys])
+          }
+        }
+      },
+      record: {
+        editor: RecordEditor,
+        renderer: 'mg.customSelect',
+        filterConfig: {
+          setCondition: (regist, value, options) => {
+            const matchKeys = []
+            Object.keys(options).forEach((key) => {
+              if (options[key].includes(value)) {
+                matchKeys.push(parseInt(key))
               }
             })
             regist('by_value', [matchKeys])
@@ -240,10 +265,8 @@ export default {
         this.formatters[column.type].filterConfig
       )
 
-      if (column.type === 'customSelectWithInputFilter') {
+      if (filterConfig.type === 'input') {
         this._createFilterInput(col, TH, filterConfig, column.selectOptions)
-      } else if (filterConfig.type === 'input') {
-        this._createFilterInput(col, TH, filterConfig)
       } else if (filterConfig.type === 'select') {
         let options = column.selectOptions
         if (Array.isArray(options)) {

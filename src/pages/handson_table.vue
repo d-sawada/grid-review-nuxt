@@ -24,7 +24,7 @@ export default {
       { header: '取引日', field: 'settlementDate', type: 'date' },
       { header: '融資金額(千円)', field: 'loanMoney', type: 'tenthousand' },
       { header: 'その他費用', field: 'otherFee', type: 'currensy' },
-      { header: '顧客氏名', field: 'customerName', type: 'customSelectWithInputFilter', selectOptions: { 1: '澤田 大輔', 2: '澤田 ほげ' } },
+      { header: '顧客氏名', field: 'customerName', type: 'record', selectOptions: { 1: '澤田 大輔', 2: '澤田 ほげ' } },
       { header: '年齢', field: 'customerAge', type: 'numeric' }
     ],
     settings: {
