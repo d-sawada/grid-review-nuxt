@@ -5,43 +5,15 @@
 <script>
 import 'handsontable/dist/handsontable.full.css'
 import 'handsontable/languages/ja-JP.js'
-import moment from 'moment'
-import { HotTable } from '@handsontable/vue'
 import Handsontable from 'handsontable'
+import { HotTable } from '@handsontable/vue'
+import moment from 'moment'
+import RecordEditor from '@/components/recordEditor'
+import TenthousandEditor from '@/components/tenthousandEditor'
+import CustomSelectRenderer from '@/components/customSelectRenderer'
+import TenthousandRenderer from '@/components/tenthousandRenderer'
 
 moment.locale('ja')
-
-function TenthousandRenderer (hotInstance, TD, row, column, prop, value, cellProperties) {
-  TD.innerHTML = (Number(value) / 1000).toLocaleString()
-  TD.style.textAlign = 'right'
-  return TD
-}
-
-function CustomSelectRenderer (hotInstance, TD, row, column, prop, value, cellProperties) {
-  TD.innerHTML = cellProperties.selectOptions[value]
-  return TD
-}
-
-class TenthousandEditor extends Handsontable.editors.TextEditor {
-  beginEditing (newInitialValue, event) {
-    super.beginEditing(newInitialValue, event)
-    this.TEXTAREA.value = this.originalValue / 1000
-  }
-
-  getValue () {
-    return this.TEXTAREA.value * 1000
-  }
-}
-
-class RecordEditor extends Handsontable.editors.SelectEditor {
-  getValue () {
-    return parseInt(this.select.value)
-  }
-
-  setValue (value) {
-    this.select.value = parseInt(value)
-  }
-}
 
 export default {
   components: {
