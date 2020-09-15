@@ -140,6 +140,13 @@ export default {
         editor: RecordEditor,
         renderer: 'mg.customSelect',
         filterConfig: {
+          type: 'select'
+        }
+      },
+      recordWithInputFilter: {
+        editor: RecordEditor,
+        renderer: 'mg.customSelect',
+        filterConfig: {
           setCondition: (regist, value, options) => {
             const matchKeys = []
             Object.keys(options).forEach((key) => {
