@@ -9,8 +9,6 @@ import moment from 'moment'
 import { HotTable } from '@handsontable/vue'
 import Handsontable from 'handsontable'
 
-global.hoge = undefined
-
 moment.locale('ja')
 
 function TenthousandRenderer (hotInstance, TD, row, column, prop, value, cellProperties) {
@@ -103,30 +101,36 @@ export default {
       select: {
         editor: 'select',
         filterConfig: {
-          type: 'select',
-          setCondition: (regist, value) => regist('contains', [value])
+          type: 'select'
         }
       },
       customSelect: {
         editor: 'select',
         renderer: 'mg.customSelect',
         filterConfig: {
-          type: 'select',
-          setCondition: (regist, value) => regist('contains', [value])
+          type: 'select'
         }
       },
       customSelectWithInputFilter: {
         editor: 'select',
+        renderer: 'mg.customSelect',
         filterConfig: {
-          type: 'input',
-          setCondition: (regist, value) => regist('contains', [value])
+          setCondition: (regist, value, options) => {
+            const matchKeys = []
+            Object.keys(options).forEach((key) => {
+              if (options[key].includes(value)) {
+                matchKeys.push(key)
+              }
+            })
+            regist('by_value', [matchKeys])
+          }
         }
       }
     }),
 
     defaultFilterConfig: () => ({
       type: 'input',
-      setCondition: (register, value) => register('contains', [value])
+      setCondition: (regist, value) => regist('contains', [value])
     }),
 
     colHeaders () {
@@ -175,7 +179,7 @@ export default {
       return this.$refs.hotTable.hotInstance
     },
 
-    _createFilterInput (col, TH, filterConfig) {
+    _createFilterInput (col, TH, filterConfig, options) {
       const DIV = document.createElement('div')
       const INPUT = document.createElement('input')
       DIV.className = 'filterHeader'
@@ -184,8 +188,11 @@ export default {
       INPUT.addEventListener('keydown', Handsontable.helper.debounce((event) => {
         const filtersPlugin = this.hot().getPlugin('filters')
         const regist = (op, args) => filtersPlugin.addCondition(col, op, args)
+
         filtersPlugin.removeConditions(col)
-        filterConfig.setCondition(regist, event.target.value)
+        if (event.target.value !== undefined && event.target.value !== '') {
+          filterConfig.setCondition(regist, event.target.value, options)
+        }
         filtersPlugin.filter()
       }, 200))
 
@@ -233,7 +240,9 @@ export default {
         this.formatters[column.type].filterConfig
       )
 
-      if (filterConfig.type === 'input') {
+      if (column.type === 'customSelectWithInputFilter') {
+        this._createFilterInput(col, TH, filterConfig, column.selectOptions)
+      } else if (filterConfig.type === 'input') {
         this._createFilterInput(col, TH, filterConfig)
       } else if (filterConfig.type === 'select') {
         let options = column.selectOptions
