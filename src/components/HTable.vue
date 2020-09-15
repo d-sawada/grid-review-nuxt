@@ -5,15 +5,17 @@
 <script>
 import 'handsontable/dist/handsontable.full.css'
 import 'handsontable/languages/ja-JP.js'
+import moment from 'moment'
 import Handsontable from 'handsontable'
 import { HotTable } from '@handsontable/vue'
-import moment from 'moment'
-import RecordEditor from '@/components/recordEditor'
-import TenthousandEditor from '@/components/tenthousandEditor'
-import CustomSelectRenderer from '@/components/customSelectRenderer'
-import TenthousandRenderer from '@/components/tenthousandRenderer'
+import formatters from '@/components/mgTable/formatters'
+import CustomSelectRenderer from '@/components/mgTable/renderer/customSelectRenderer'
+import TenthousandRenderer from '@/components/mgTable/renderer/tenthousandRenderer'
 
 moment.locale('ja')
+
+Handsontable.renderers.registerRenderer('mg.tenthousand', TenthousandRenderer)
+Handsontable.renderers.registerRenderer('mg.customSelect', CustomSelectRenderer)
 
 export default {
   components: {
@@ -36,102 +38,6 @@ export default {
   },
 
   computed: {
-    formatters: () => ({
-      text: {
-        type: 'text'
-      },
-      numeric: {
-        type: 'numeric'
-      },
-      currensy: {
-        type: 'numeric',
-        numericFormat: {
-          pattern: '¥0,0',
-          culture: 'ja-JP'
-        }
-      },
-      tenthousand: {
-        type: 'numeric',
-        numericFormat: {
-          pattern: '¥0,0',
-          culture: 'ja-JP'
-        },
-        renderer: 'mg.tenthousand',
-        editor: TenthousandEditor,
-        filterConfig: {
-          setCondition: (regist, value) => regist('contains', [value * 1000])
-        }
-      },
-      date: {
-        type: 'date',
-        dateFormat: 'YYYY/MM/DD',
-        correctFormat: true,
-        defaultDate: moment().format('YYYY/MM/DD'),
-        datePickerConfig: {
-          yearSuffix: '年',
-          showMonthAfterYear: true,
-          showDaysInNextAndPreviousMonths: true,
-          i18n: {
-            previousMonth: '前月',
-            nextMonth: '次月',
-            months: moment.localeData()._months,
-            weekdays: moment.localeData()._weekdays,
-            weekdaysShort: moment.localeData()._weekdaysShort
-          }
-        }
-      },
-      select: {
-        editor: 'select',
-        filterConfig: {
-          type: 'select'
-        }
-      },
-      customSelect: {
-        editor: 'select',
-        renderer: 'mg.customSelect',
-        filterConfig: {
-          type: 'select'
-        }
-      },
-      customSelectWithInputFilter: {
-        editor: 'select',
-        renderer: 'mg.customSelect',
-        filterConfig: {
-          setCondition: (regist, value, options) => {
-            const matchKeys = []
-            Object.keys(options).forEach((key) => {
-              if (options[key].includes(value)) {
-                matchKeys.push(key)
-              }
-            })
-            regist('by_value', [matchKeys])
-          }
-        }
-      },
-      record: {
-        editor: RecordEditor,
-        renderer: 'mg.customSelect',
-        filterConfig: {
-          type: 'select'
-        }
-      },
-      recordWithInputFilter: {
-        editor: RecordEditor,
-        renderer: 'mg.customSelect',
-        filterConfig: {
-          setCondition: (regist, value, options) => {
-            const matchKeys = []
-            Object.keys(options).forEach((key) => {
-              if (options[key].includes(value)) {
-                matchKeys.push(parseInt(key))
-              }
-            })
-            regist('by_value', [matchKeys])
-          }
-        }
-      }
-    }),
-
     defaultFilterConfig: () => ({
       type: 'input',
       setCondition: (regist, value) => regist('contains', [value])
@@ -145,7 +51,7 @@ export default {
       return this.columns.map((column) => {
         return Object.assign(
           {},
-          this.formatters[column.type],
+          formatters[column.type],
           {
             data: column.field,
             selectOptions: column.selectOptions
@@ -171,11 +77,6 @@ export default {
         columns: this.columnSettings
       }, this.settings)
     }
-  },
-
-  created () {
-    Handsontable.renderers.registerRenderer('mg.tenthousand', TenthousandRenderer)
-    Handsontable.renderers.registerRenderer('mg.customSelect', CustomSelectRenderer)
   },
 
   methods: {
@@ -241,7 +142,7 @@ export default {
       const filterConfig = Object.assign(
         {},
         this.defaultFilterConfig,
-        this.formatters[column.type].filterConfig
+        formatters[column.type].filterConfig
       )
 
       if (filterConfig.type === 'input') {
