@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  nuxt: &app_base
+    image: node:14.10.0-alpine
+    tty: true
+    working_dir: /var/www/web
+    volumes:
+      - ./src:/var/www/web
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+    restart: always
+    ports:
+      - 8080:3000
+    command: yarn dev
